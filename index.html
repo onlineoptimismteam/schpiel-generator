@@ -1,188 +1,946 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Schpiel Generator API</title>
-    <script>
-        // This runs immediately to handle webhook requests
-        (function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            // Check if this is an automated API call
-            if (urlParams.get('auto') === 'true' && urlParams.get('client')) {
-                const clientData = {
-                    "Healthcare": ["504 Health Net", "Access Health", "Big Easy Medical", "Doctors Imaging", "MidCity TMS", "Southern ENT Associates", "Magnolia PT", "Medcentris", "St. Thomas Community Health Center"],
-                    "Legal": ["Guarisco Cordes Lala", "Kruger& Hodges", "Law Office of Lance J. Robinson", "Kuchler Polk Weiner", "Valor Firm Client Square"],
-                    "Financial": ["Crescent Bank", "First Bank", "Hibernia Bank", "Pelicoin", "OneMain", "Rent Reporters", "Tapcheck"],
-                    "Education": ["Crescent City Schools", "Tulane I I H E", "University View Academy", "Louisiana School", "Valor Academy", "YCP"],
-                    "Nonprofit": ["American Bird Conservancy", "Camp Restore", "EPNO", "Network Volunteers", "The Data Center"],
-                    "Hospitality": ["Chateau Le Moyne", "Le Petit Theatre", "Red Horse Inn", "Lafitte Guest House", "Royal Heritage"],
-                    "Real Estate": ["1201 Canal", "Four Winds", "Grand River", "Property One", "Wharf"],
-                    "Food & Beverage": ["Cafe Beignet", "Dixie Beer", "Elysian Bar", "La Boca", "Miette", "Dragonfly Cafe"],
-                    "Technology": ["Guardian Computer", "ID Scan", "Synergy", "Olive", "Trademark Media"],
-                    "Retail": ["Acadian Windows", "Eisenhower Consignment", "Miette", "Bauhaus Salon"],
-                    "Manufacturing": ["Armana Productions", "Craft Kettle", "Good Wood Nola", "Oracle Lighting", "Royal Coatings"],
-                    "Construction": ["Bollinger Shipyards", "Gallo Mechanical", "Hummel Construction", "Landis Construction", "StrongBuilt Construction"],
-                    "Wellness": ["Breathing Deeply", "Hair Loft", "Nerd Fitness"],
-                    "Automotive": ["Superior Honda"],
-                    "Media & Entertainment": ["Moxie Media", "The Swan Princess", "W W O Z"],
-                    "Professional Services": ["Cardinal Expo", "DIY Pest Control", "GoodBee", "STM Bags", "York"],
-                    "E-commerce": ["Passion Lillie", "Saint Hugh"],
-                    "Tourism": ["Unique Nola"],
-                    "Government": ["Downtown Development District", "JPFA", "NORPC", "Warren Montgomery, District Attorney"]
-                };
-                
-                // Get parameters
-                const client = urlParams.get('client') || 'Your Company';
-                const industry = urlParams.get('industry') || '';
-                const contact = urlParams.get('contact') || '';
-                const referral = urlParams.get('referral') || '';
-                const social = urlParams.get('social') || '';
-                const strengths = urlParams.get('strengths') || '';
-                const improvements = urlParams.get('improvements') || '';
-                const notes = urlParams.get('notes') || '';
-                const format = urlParams.get('format') || 'json';
-                
-                // Variation arrays for dynamic content
-                const intros = [
-                    "I'm Flynn, CEO of Online Optimism. I founded the agency in 2012 by myself. Since then, we've grown to a team of twenty full-time employees",
-                    "Hi, I'm Flynn, founder and CEO of Online Optimism. What started as a solo venture in 2012 has evolved into a dynamic team of twenty professionals",
-                    "I'm Flynn, and I lead Online Optimism. From humble beginnings in 2012, we've built a dedicated team of twenty digital marketing experts"
-                ];
-                
-                const locations = [
-                    "based around the East Coast and Gulf Coast",
-                    "distributed across the Eastern seaboard and Gulf region",
-                    "with team members from New Orleans to New York"
-                ];
-                
-                const work = [
-                    "working for thirty to forty clients at a time with their digital marketing & creative efforts",
-                    "partnering with 30-40 businesses on their digital transformation journeys",
-                    "managing comprehensive digital strategies for dozens of clients simultaneously"
-                ];
-                
-                // Build schpiel with variations
-                let schpiel = "[Introduction]\n";
-                schpiel += intros[Math.floor(Math.random() * intros.length)] + ", ";
-                schpiel += locations[Math.floor(Math.random() * locations.length)] + ", ";
-                schpiel += work[Math.floor(Math.random() * work.length)] + ".\n\n";
-                
-                // Industry section
-                if (industry && clientData[industry]) {
-                    schpiel += `We have extensive experience in the ${industry} space, which gives us unique insights into your market.\n\n`;
-                    const examples = clientData[industry].sort(() => 0.5 - Math.random()).slice(0, 2);
-                    if (examples.length > 0) {
-                        schpiel += `Some of our ${industry.toLowerCase()} clients include ${examples.join(' and ')}, giving us deep insights into what works in your market.\n\n`;
-                    }
-                } else {
-                    schpiel += "We've worked with over 170 clients across diverse industries, bringing cross-sector insights that often lead to breakthrough strategies.\n\n";
-                    // Pull random examples from different industries
-                    const randomExamples = [
-                        clientData['Healthcare']?.[Math.floor(Math.random() * clientData['Healthcare'].length)],
-                        clientData['Financial']?.[Math.floor(Math.random() * clientData['Financial'].length)],
-                        clientData['Hospitality']?.[Math.floor(Math.random() * clientData['Hospitality'].length)]
-                    ].filter(Boolean);
-                    if (randomExamples.length > 0) {
-                        schpiel += `Our portfolio includes companies like ${randomExamples.join(', ')}, showcasing our versatility and expertise.\n\n`;
-                    }
-                }
-                
-                // Client focus section
-                schpiel += `[Focus on ${client}]\n`;
-                
-                if (referral) {
-                    schpiel += `Before this conversation, our team reviewed the notes from ${referral}, as well as your online presence, to make this meeting as efficient as possible since we know your time is valuable.\n\n`;
-                } else {
-                    schpiel += "Before this conversation, our team reviewed your online presence to make this meeting as efficient as possible since we know your time is valuable.\n\n";
-                }
-                
-                // Social media analysis
-                if (social) {
-                    const platforms = social.split(',').map(p => p.trim());
-                    schpiel += `We analyzed your presence across ${platforms.length} platforms including ${platforms.slice(0, 3).join(', ')}. `;
-                    schpiel += "We've done a comprehensive analysis of your content strategy, engagement metrics, and competitive positioning.\n\n";
-                } else {
-                    schpiel += "We've conducted a thorough review of your digital footprint to understand your current market position.\n\n";
-                }
-                
-                // Strengths section
-                schpiel += "[Strengths & Observations]\n";
-                if (strengths) {
-                    schpiel += `You've clearly built something impressive with ${client}. ${strengths}.\n\n`;
-                } else {
-                    schpiel += `You've clearly built something impressive with ${client}. Your commitment to excellence is clear, and there's obvious potential for growth.\n\n`;
-                }
-                
-                // Improvements section
-                schpiel += "[Growth Opportunities]\n";
-                if (improvements) {
-                    schpiel += `We've identified several strategic opportunities where ${improvements}. `;
-                    schpiel += "These are exactly the types of challenges Online Optimism excels at solving.\n\n";
-                } else {
-                    schpiel += "We've identified several strategic opportunities where Online Optimism's expertise could really make a difference. ";
-                    schpiel += "Based on our initial review, there are several high-impact strategies we could implement quickly.\n\n";
-                }
-                
-                // Additional notes
-                if (notes) {
-                    schpiel += `[Additional Context]\n${notes}\n\n`;
-                }
-                
-                // Closing
-                const closings = [
-                    `All that to say, I want to make the most of our time together today. We can approach this conversation in two ways: I'm happy to answer any questions you have about Online Optimism and how we work, or I can dive into learning more about ${client} with some strategic questions I've prepared to determine if we're the right fit for each other. What would be most valuable for you?`,
-                    `So here's where we are - I can tell you more about Online Optimism and our approach, or we can focus on ${client} and explore whether there's a good match between what you need and what we offer. Which direction feels right to you?`,
-                    `Now, let's make this conversation work for you. Would you prefer to hear more about our agency and process, or should I jump into my questions about ${client} to see how we might be able to help? I'm ready either way.`
-                ];
-                
-                schpiel += "[Next Steps]\n";
-                schpiel += closings[Math.floor(Math.random() * closings.length)];
-                
-                // Output based on format
-                if (format === 'json') {
-                    const jsonResponse = {
-                        success: true,
-                        clientName: client,
-                        contactName: contact,
-                        industry: industry,
-                        referralSource: referral,
-                        socialPlatforms: social,
-                        strengths: strengths,
-                        improvements: improvements,
-                        additionalNotes: notes,
-                        schpielText: schpiel,
-                        generatedAt: new Date().toISOString(),
-                        version: "2.1"
-                    };
-                    
-                    document.write(JSON.stringify(jsonResponse, null, 2));
-                    document.close();
-                } else if (format === 'text') {
-                    document.write(schpiel);
-                    document.close();
-                } else {
-                    // Default HTML output
-                    document.write('<pre>' + schpiel + '</pre>');
-                    document.close();
-                }
-            } else {
-                // No parameters or not auto - show basic instructions
-                document.write('<h1>Schpiel Generator API</h1>');
-                document.write('<p>This endpoint requires parameters:</p>');
-                document.write('<ul>');
-                document.write('<li>client (required)</li>');
-                document.write('<li>auto=true (required)</li>');
-                document.write('<li>format=json (recommended)</li>');
-                document.write('<li>industry, contact, referral, social, strengths, improvements, notes (optional)</li>');
-                document.write('</ul>');
-                document.write('<p>Example: ?client=TestCompany&industry=Healthcare&format=json&auto=true</p>');
-                document.close();
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Optimism - Discovery Call Schpiel Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --success: #10b981;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        .bg-animation::before,
+        .bg-animation::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            filter: blur(80px);
+            animation: float 20s infinite ease-in-out;
+        }
+        
+        .bg-animation::before {
+            top: -200px;
+            right: -200px;
+            animation-delay: 0s;
+        }
+        
+        .bg-animation::after {
+            bottom: -200px;
+            left: -200px;
+            animation-delay: 10s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(100px, 50px) scale(1.1); }
+            50% { transform: translate(-50px, 100px) scale(0.9); }
+            75% { transform: translate(50px, -50px) scale(1.05); }
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: slideDown 0.8s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
             }
-        })();
-    </script>
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: white;
+            font-size: 3em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.3em;
+            font-weight: 300;
+        }
+        
+        /* Main card */
+        .main-card {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: var(--light);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            font-weight: 600;
+            color: var(--gray);
+        }
+        
+        .tab:hover {
+            background: rgba(99,102,241,0.05);
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            background: white;
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        /* Form styles */
+        .form-container {
+            padding: 40px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            position: relative;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .required {
+            color: var(--accent);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid transparent;
+            background: var(--light);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        /* Tone selector */
+        .tone-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .tone-option {
+            padding: 15px;
+            border: 2px solid var(--light);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            background: white;
+        }
+        
+        .tone-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99,102,241,0.2);
+        }
+        
+        .tone-option.selected {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: transparent;
+            font-weight: 600;
+        }
+        
+        .tone-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 18px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(99,102,241,0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gray);
+            color: white;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* Output section */
+        .output-container {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .output-container.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .output-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        .output-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .success-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--success), #22c55e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            animation: bounceIn 0.5s ease-out;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .output-meta {
+            display: flex;
+            gap: 20px;
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Schpiel output */
+        .schpiel-output {
+            background: linear-gradient(135deg, var(--light), white);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .schpiel-output::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-size: 100px;
+            color: rgba(99,102,241,0.1);
+            font-family: Georgia, serif;
+        }
+        
+        .schpiel-content {
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-size: 16px;
+            color: var(--dark);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .schpiel-section {
+            margin-bottom: 20px;
+        }
+        
+        .section-label {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        
+        /* Action buttons for output */
+        .output-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .action-btn {
+            padding: 15px;
+            border: 2px solid var(--light);
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .action-btn:hover {
+            border-color: var(--primary);
+            background: var(--light);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99,102,241,0.2);
+        }
+        
+        .action-btn.success {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+        
+        /* Client showcase */
+        .client-showcase {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(99,102,241,0.05), rgba(139,92,246,0.05));
+            border-radius: 20px;
+        }
+        
+        .client-showcase h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .client-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .client-pill {
+            padding: 8px 16px;
+            background: white;
+            border-radius: 20px;
+            font-size: 14px;
+            color: var(--dark);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .client-pill:nth-child(n) {
+            animation-delay: calc(0.05s * var(--index));
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Loading state */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tone-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            .output-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <p>Loading...</p>
+    <div class="bg-animation"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">🚀</div>
+            </div>
+            <h1>Discovery Call Generator</h1>
+            <p class="subtitle">Create personalized pre-call scripts powered by AI</p>
+        </header>
+        
+        <div class="main-card">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('input')">
+                    <span>📝 Create Schpiel</span>
+                </div>
+                <div class="tab" onclick="switchTab('output')">
+                    <span>📄 Generated Script</span>
+                </div>
+            </div>
+            
+            <div class="form-container" id="inputTab">
+                <form id="schpielForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="clientName">Company Name <span class="required">*</span></label>
+                            <input type="text" id="clientName" placeholder="e.g., Acme Corporation" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contactName">Contact Person</label>
+                            <input type="text" id="contactName" placeholder="e.g., Jane Smith">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="industry">Industry</label>
+                            <select id="industry">
+                                <option value="">Select Industry</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Legal">Legal Services</option>
+                                <option value="Financial">Financial Services</option>
+                                <option value="Education">Education</option>
+                                <option value="Nonprofit">Nonprofit</option>
+                                <option value="Hospitality">Hospitality</option>
+                                <option value="Real Estate">Real Estate</option>
+                                <option value="Food & Beverage">Food & Beverage</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Manufacturing">Manufacturing</option>
+                                <option value="Construction">Construction</option>
+                                <option value="Wellness">Wellness</option>
+                                <option value="Automotive">Automotive</option>
+                                <option value="Media & Entertainment">Media & Entertainment</option>
+                                <option value="Professional Services">Professional Services</option>
+                                <option value="E-commerce">E-commerce</option>
+                                <option value="Tourism">Tourism</option>
+                                <option value="Government">Government</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="referralSource">Referral Source</label>
+                            <input type="text" id="referralSource" placeholder="e.g., LinkedIn, Josh at Sculpt">
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="socialPlatforms">Social Media Platforms</label>
+                            <input type="text" id="socialPlatforms" placeholder="e.g., Instagram, Facebook, LinkedIn, TikTok">
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="strengths">Notable Strengths & Achievements</label>
+                            <textarea id="strengths" placeholder="What are they doing well? Notable partnerships, successful campaigns, strong brand presence..."></textarea>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="improvements">Growth Opportunities</label>
+                            <textarea id="improvements" placeholder="Areas where we could help: engagement rates, content consistency, SEO, paid advertising..."></textarea>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="additionalNotes">Additional Research Notes</label>
+                            <textarea id="additionalNotes" placeholder="Any other context or insights about the client..."></textarea>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label>Conversation Tone</label>
+                            <div class="tone-selector">
+                                <div class="tone-option selected" data-tone="professional" onclick="selectTone(this)">
+                                    <div class="tone-icon">💼</div>
+                                    <div>Professional</div>
+                                </div>
+                                <div class="tone-option" data-tone="friendly" onclick="selectTone(this)">
+                                    <div class="tone-icon">😊</div>
+                                    <div>Friendly</div>
+                                </div>
+                                <div class="tone-option" data-tone="enthusiastic" onclick="selectTone(this)">
+                                    <div class="tone-icon">🎯</div>
+                                    <div>Enthusiastic</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">Generate Schpiel</button>
+                        <button type="button" class="btn btn-secondary" onclick="clearForm()">Clear Form</button>
+                    </div>
+                </form>
+                
+                <div class="client-showcase">
+                    <h3>✨ Trusted by 170+ Clients Including:</h3>
+                    <div class="client-pills" id="clientPills"></div>
+                </div>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Generating your personalized schpiel...</p>
+            </div>
+            
+            <div class="output-container" id="outputTab">
+                <div class="output-header">
+                    <div class="output-title">
+                        <div class="success-icon">✓</div>
+                        <div>
+                            <h2>Your Schpiel is Ready!</h2>
+                            <p style="color: var(--gray); margin-top: 5px;">Personalized script for <span id="outputClient" style="color: var(--primary); font-weight: 600;"></span></p>
+                        </div>
+                    </div>
+                    <div class="output-meta">
+                        <div class="meta-item">
+                            <span>📅</span>
+                            <span id="generatedDate"></span>
+                        </div>
+                        <div class="meta-item">
+                            <span>⏱️</span>
+                            <span>~3 min read</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="schpiel-output">
+                    <div class="schpiel-content" id="schpielContent"></div>
+                </div>
+                
+                <div class="output-actions">
+                    <button class="action-btn" onclick="copyToClipboard()">
+                        <span>📋</span>
+                        <span>Copy to Clipboard</span>
+                    </button>
+                    <button class="action-btn" onclick="downloadSchpiel()">
+                        <span>💾</span>
+                        <span>Download as Text</span>
+                    </button>
+                    <button class="action-btn" onclick="emailSchpiel()">
+                        <span>✉️</span>
+                        <span>Email to Team</span>
+                    </button>
+                    <button class="action-btn" onclick="regenerate()">
+                        <span>🔄</span>
+                        <span>Regenerate</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Client data
+        const clientData = {
+            "Healthcare": ["504 Health Net", "Access Health", "Big Easy Medical", "Doctors Imaging", "MidCity TMS", "Southern ENT Associates"],
+            "Legal": ["Guarisco Cordes Lala", "Kruger& Hodges", "Law Office of Lance J. Robinson"],
+            "Financial": ["Crescent Bank", "First Bank", "Hibernia Bank", "Pelicoin"],
+            "Education": ["Crescent City Schools", "Tulane I I H E", "University View Academy"],
+            "Hospitality": ["Chateau Le Moyne", "Le Petit Theatre", "Red Horse Inn"],
+            "Real Estate": ["1201 Canal", "Four Winds", "Property One"],
+            "Food & Beverage": ["Cafe Beignet", "Dixie Beer", "Elysian Bar"],
+            "Technology": ["Guardian Computer", "ID Scan", "Synergy"],
+            "Manufacturing": ["Craft Kettle", "Oracle Lighting", "Royal Coatings"]
+        };
+        
+        // Variation data
+        const variations = {
+            intros: {
+                professional: [
+                    "I'm Flynn, CEO of Online Optimism. I founded the agency in 2012 by myself. Since then, we've grown to a team of twenty full-time employees"
+                ],
+                friendly: [
+                    "Hi, I'm Flynn, founder and CEO of Online Optimism. What started as a solo venture in 2012 has evolved into a dynamic team of twenty professionals"
+                ],
+                enthusiastic: [
+                    "Flynn here, CEO of Online Optimism! Over the past 13 years, we've grown from a one-person operation to a thriving agency of twenty specialists"
+                ]
+            }
+        };
+        
+        let currentSchpiel = '';
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            showClientPills();
+            document.getElementById('schpielForm').addEventListener('submit', handleSubmit);
+        });
+        
+        function showClientPills() {
+            const container = document.getElementById('clientPills');
+            const sampleClients = [
+                "Dixie Beer", "Southern ENT Associates", "Crescent Bank", 
+                "Le Petit Theatre", "Guardian Computer", "Cafe Beignet",
+                "Property One", "Tulane I I H E"
+            ];
+            
+            container.innerHTML = sampleClients.map((client, index) => 
+                `<div class="client-pill" style="--index: ${index}">${client}</div>`
+            ).join('');
+        }
+        
+        function selectTone(element) {
+            document.querySelectorAll('.tone-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'output') {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('inputTab').style.display = 'none';
+                document.getElementById('outputTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('inputTab').style.display = 'block';
+                document.getElementById('outputTab').classList.remove('active');
+            }
+        }
+        
+        function handleSubmit(e) {
+            e.preventDefault();
+            
+            const clientName = document.getElementById('clientName').value;
+            if (!clientName) {
+                alert('Please enter a company name');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('inputTab').style.display = 'none';
+            document.getElementById('loading').classList.add('active');
+            
+            // Generate schpiel
+            setTimeout(() => {
+                generateSchpiel();
+                document.getElementById('loading').classList.remove('active');
+                switchTab('output');
+            }, 1500);
+        }
+        
+        function generateSchpiel() {
+            const client = document.getElementById('clientName').value;
+            const contact = document.getElementById('contactName').value;
+            const industry = document.getElementById('industry').value;
+            const referral = document.getElementById('referralSource').value;
+            const social = document.getElementById('socialPlatforms').value;
+            const strengths = document.getElementById('strengths').value;
+            const improvements = document.getElementById('improvements').value;
+            const notes = document.getElementById('additionalNotes').value;
+            const tone = document.querySelector('.tone-option.selected').dataset.tone;
+            
+            let schpiel = `[Introduction]\n`;
+            schpiel += variations.intros[tone][0] + `, based around the East Coast and Gulf Coast, working for thirty to forty clients at a time with their digital marketing & creative efforts.\n\n`;
+            
+            if (industry && clientData[industry]) {
+                schpiel += `[Industry Experience]\n`;
+                schpiel += `We have extensive experience in the ${industry} space, which gives us unique insights into your market.\n`;
+                const examples = clientData[industry].slice(0, 2);
+                if (examples.length > 0) {
+                    schpiel += `Some of our ${industry.toLowerCase()} clients include ${examples.join(' and ')}, giving us deep insights into what works in your market.\n\n`;
+                }
+            }
+            
+            schpiel += `[Research & Preparation]\n`;
+            if (referral) {
+                schpiel += `Before this conversation, our team reviewed the notes from ${referral}, as well as your online presence, to make this meeting as efficient as possible since we know your time is valuable.\n\n`;
+            } else {
+                schpiel += `Before this conversation, our team reviewed your online presence to make this meeting as efficient as possible since we know your time is valuable.\n\n`;
+            }
+            
+            if (social) {
+                schpiel += `[Digital Presence Analysis]\n`;
+                const platforms = social.split(',').map(p => p.trim());
+                schpiel += `We analyzed your presence across ${platforms.join(', ')}. We've done a comprehensive analysis of your content strategy, engagement metrics, and competitive positioning.\n\n`;
+            }
+            
+            schpiel += `[Strengths & Observations]\n`;
+            if (strengths) {
+                schpiel += `You've clearly built something impressive with ${client}. ${strengths}.\n\n`;
+            } else {
+                schpiel += `You've clearly built something impressive with ${client}. Your commitment to excellence is clear, and there's obvious potential for growth.\n\n`;
+            }
+            
+            schpiel += `[Growth Opportunities]\n`;
+            if (improvements) {
+                schpiel += `We've identified several strategic opportunities where ${improvements}. These are exactly the types of challenges Online Optimism excels at solving.\n\n`;
+            } else {
+                schpiel += `We've identified several strategic opportunities where Online Optimism's expertise could really make a difference.\n\n`;
+            }
+            
+            if (notes) {
+                schpiel += `[Additional Context]\n${notes}\n\n`;
+            }
+            
+            schpiel += `[Next Steps]\n`;
+            schpiel += `All that to say, I want to make the most of our time together today. We can approach this conversation in two ways: I'm happy to answer any questions you have about Online Optimism and how we work, or I can dive into learning more about ${client} with some strategic questions I've prepared to determine if we're the right fit for each other. What would be most valuable for you?`;
+            
+            currentSchpiel = schpiel;
+            
+            // Update output
+            document.getElementById('schpielContent').textContent = schpiel;
+            document.getElementById('outputClient').textContent = client;
+            document.getElementById('generatedDate').textContent = new Date().toLocaleDateString();
+        }
+        
+        function copyToClipboard() {
+            navigator.clipboard.writeText(currentSchpiel).then(() => {
+                const btn = event.target.closest('.action-btn');
+                btn.classList.add('success');
+                btn.innerHTML = '<span>✓</span><span>Copied!</span>';
+                setTimeout(() => {
+                    btn.classList.remove('success');
+                    btn.innerHTML = '<span>📋</span><span>Copy to Clipboard</span>';
+                }, 2000);
+            });
+        }
+        
+        function downloadSchpiel() {
+            const client = document.getElementById('clientName').value;
+            const blob = new Blob([currentSchpiel], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `schpiel_${client.replace(/\s+/g, '_')}_${Date.now()}.txt`;
+            a.click();
+        }
+        
+        function emailSchpiel() {
+            const client = document.getElementById('clientName').value;
+            const subject = encodeURIComponent(`Discovery Call Script - ${client}`);
+            const body = encodeURIComponent(currentSchpiel);
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+        
+        function regenerate() {
+            generateSchpiel();
+            const btn = event.target.closest('.action-btn');
+            btn.style.animation = 'spin 0.5s ease-out';
+            setTimeout(() => btn.style.animation = '', 500);
+        }
+        
+        function clearForm() {
+            document.getElementById('schpielForm').reset();
+            document.querySelectorAll('.tone-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector('.tone-option[data-tone="professional"]').classList.add('selected');
+        }
+    </script>
 </body>
 </html>
