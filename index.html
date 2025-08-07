@@ -435,8 +435,26 @@
             z-index: 1;
         }
         
+        .schpiel-content p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        .schpiel-content strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
         .schpiel-section {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(99,102,241,0.1);
+        }
+        
+        .schpiel-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
         }
         
         .section-label {
@@ -445,7 +463,17 @@
             font-size: 0.9em;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-label::before {
+            content: '';
+            width: 20px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
         }
         
         /* Action buttons for output */
@@ -740,6 +768,14 @@
                         <span>🔄</span>
                         <span>Regenerate</span>
                     </button>
+                    <button class="action-btn" onclick="editInputs()">
+                        <span>✏️</span>
+                        <span>Edit Inputs</span>
+                    </button>
+                    <button class="action-btn" onclick="shareLink()">
+                        <span>🔗</span>
+                        <span>Share Link</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -780,6 +816,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             showClientPills();
             document.getElementById('schpielForm').addEventListener('submit', handleSubmit);
+            
+            // Check for URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('client')) {
+                handleURLParameters(urlParams);
+            }
         });
         
         function showClientPills() {
@@ -836,7 +878,7 @@
         }
         
         function generateSchpiel() {
-            const client = document.getElementById('clientName').value;
+            const client = document.getElementById('clientName').value || 'Your Company';
             const contact = document.getElementById('contactName').value;
             const industry = document.getElementById('industry').value;
             const referral = document.getElementById('referralSource').value;
@@ -846,58 +888,139 @@
             const notes = document.getElementById('additionalNotes').value;
             const tone = document.querySelector('.tone-option.selected').dataset.tone;
             
-            let schpiel = `[Introduction]\n`;
-            schpiel += variations.intros[tone][0] + `, based around the East Coast and Gulf Coast, working for thirty to forty clients at a time with their digital marketing & creative efforts.\n\n`;
+            // Format the schpiel with better HTML structure
+            let schpielHTML = '';
             
+            // Introduction
+            schpielHTML += `<div class="schpiel-section">`;
+            schpielHTML += `<div class="section-label">[Introduction]</div>`;
+            schpielHTML += `<p>${variations.intros[tone][0]}, based around the East Coast and Gulf Coast, working for thirty to forty clients at a time with their digital marketing & creative efforts.</p>`;
+            schpielHTML += `</div>`;
+            
+            // Industry Experience
             if (industry && clientData[industry]) {
-                schpiel += `[Industry Experience]\n`;
-                schpiel += `We have extensive experience in the ${industry} space, which gives us unique insights into your market.\n`;
+                schpielHTML += `<div class="schpiel-section">`;
+                schpielHTML += `<div class="section-label">[Industry Experience]</div>`;
+                schpielHTML += `<p>We have extensive experience in the ${industry} space, which gives us unique insights into your market.</p>`;
                 const examples = clientData[industry].slice(0, 2);
                 if (examples.length > 0) {
-                    schpiel += `Some of our ${industry.toLowerCase()} clients include ${examples.join(' and ')}, giving us deep insights into what works in your market.\n\n`;
+                    schpielHTML += `<p>Some of our ${industry.toLowerCase()} clients include <strong>${examples.join(' and ')}</strong>, giving us deep insights into what works in your market.</p>`;
+                }
+                schpielHTML += `</div>`;
+            }
+            
+            // Research & Preparation
+            schpielHTML += `<div class="schpiel-section">`;
+            schpielHTML += `<div class="section-label">[Research & Preparation]</div>`;
+            if (referral && referral !== 'No') {
+                schpielHTML += `<p>Before this conversation, our team reviewed the notes from <strong>${referral}</strong>, as well as your online presence, to make this meeting as efficient as possible since we know your time is valuable.</p>`;
+            } else {
+                schpielHTML += `<p>Before this conversation, our team reviewed your online presence to make this meeting as efficient as possible since we know your time is valuable.</p>`;
+            }
+            schpielHTML += `</div>`;
+            
+            // Digital Presence Analysis
+            if (social && social !== 'No social') {
+                schpielHTML += `<div class="schpiel-section">`;
+                schpielHTML += `<div class="section-label">[Digital Presence Analysis]</div>`;
+                const platforms = social.split(',').map(p => p.trim());
+                schpielHTML += `<p>We analyzed your presence across <strong>${platforms.join(', ')}</strong>. We've done a comprehensive analysis of your content strategy, engagement metrics, and competitive positioning.</p>`;
+                schpielHTML += `</div>`;
+            }
+            
+            // Strengths & Observations
+            schpielHTML += `<div class="schpiel-section">`;
+            schpielHTML += `<div class="section-label">[Strengths & Observations]</div>`;
+            if (strengths && strengths !== 'No Strengths') {
+                schpielHTML += `<p>You've clearly built something impressive with <strong>${client}</strong>. ${strengths}.</p>`;
+            } else {
+                schpielHTML += `<p>You've clearly built something impressive with <strong>${client}</strong>. Your commitment to excellence is clear, and there's obvious potential for growth.</p>`;
+            }
+            schpielHTML += `</div>`;
+            
+            // Growth Opportunities
+            schpielHTML += `<div class="schpiel-section">`;
+            schpielHTML += `<div class="section-label">[Growth Opportunities]</div>`;
+            if (improvements && improvements !== 'No') {
+                schpielHTML += `<p>We've identified several strategic opportunities where ${improvements}. These are exactly the types of challenges Online Optimism excels at solving.</p>`;
+            } else {
+                schpielHTML += `<p>We've identified several strategic opportunities where Online Optimism's expertise could really make a difference.</p>`;
+            }
+            schpielHTML += `</div>`;
+            
+            // Additional Context
+            if (notes && notes !== 'No notes') {
+                schpielHTML += `<div class="schpiel-section">`;
+                schpielHTML += `<div class="section-label">[Additional Context]</div>`;
+                schpielHTML += `<p>${notes}</p>`;
+                schpielHTML += `</div>`;
+            }
+            
+            // Next Steps
+            schpielHTML += `<div class="schpiel-section">`;
+            schpielHTML += `<div class="section-label">[Next Steps]</div>`;
+            schpielHTML += `<p>All that to say, I want to make the most of our time together today. We can approach this conversation in two ways: I'm happy to answer any questions you have about Online Optimism and how we work, or I can dive into learning more about <strong>${client}</strong> with some strategic questions I've prepared to determine if we're the right fit for each other. What would be most valuable for you?</p>`;
+            schpielHTML += `</div>`;
+            
+            // Create plain text version for copying
+            let plainText = '';
+            plainText += `[Introduction]\n`;
+            plainText += `${variations.intros[tone][0]}, based around the East Coast and Gulf Coast, working for thirty to forty clients at a time with their digital marketing & creative efforts.\n\n`;
+            
+            if (industry && clientData[industry]) {
+                plainText += `[Industry Experience]\n`;
+                plainText += `We have extensive experience in the ${industry} space, which gives us unique insights into your market.\n`;
+                const examples = clientData[industry].slice(0, 2);
+                if (examples.length > 0) {
+                    plainText += `Some of our ${industry.toLowerCase()} clients include ${examples.join(' and ')}, giving us deep insights into what works in your market.\n\n`;
                 }
             }
             
-            schpiel += `[Research & Preparation]\n`;
-            if (referral) {
-                schpiel += `Before this conversation, our team reviewed the notes from ${referral}, as well as your online presence, to make this meeting as efficient as possible since we know your time is valuable.\n\n`;
+            plainText += `[Research & Preparation]\n`;
+            if (referral && referral !== 'No') {
+                plainText += `Before this conversation, our team reviewed the notes from ${referral}, as well as your online presence, to make this meeting as efficient as possible since we know your time is valuable.\n\n`;
             } else {
-                schpiel += `Before this conversation, our team reviewed your online presence to make this meeting as efficient as possible since we know your time is valuable.\n\n`;
+                plainText += `Before this conversation, our team reviewed your online presence to make this meeting as efficient as possible since we know your time is valuable.\n\n`;
             }
             
-            if (social) {
-                schpiel += `[Digital Presence Analysis]\n`;
+            if (social && social !== 'No social') {
+                plainText += `[Digital Presence Analysis]\n`;
                 const platforms = social.split(',').map(p => p.trim());
-                schpiel += `We analyzed your presence across ${platforms.join(', ')}. We've done a comprehensive analysis of your content strategy, engagement metrics, and competitive positioning.\n\n`;
+                plainText += `We analyzed your presence across ${platforms.join(', ')}. We've done a comprehensive analysis of your content strategy, engagement metrics, and competitive positioning.\n\n`;
             }
             
-            schpiel += `[Strengths & Observations]\n`;
-            if (strengths) {
-                schpiel += `You've clearly built something impressive with ${client}. ${strengths}.\n\n`;
+            plainText += `[Strengths & Observations]\n`;
+            if (strengths && strengths !== 'No Strengths') {
+                plainText += `You've clearly built something impressive with ${client}. ${strengths}.\n\n`;
             } else {
-                schpiel += `You've clearly built something impressive with ${client}. Your commitment to excellence is clear, and there's obvious potential for growth.\n\n`;
+                plainText += `You've clearly built something impressive with ${client}. Your commitment to excellence is clear, and there's obvious potential for growth.\n\n`;
             }
             
-            schpiel += `[Growth Opportunities]\n`;
-            if (improvements) {
-                schpiel += `We've identified several strategic opportunities where ${improvements}. These are exactly the types of challenges Online Optimism excels at solving.\n\n`;
+            plainText += `[Growth Opportunities]\n`;
+            if (improvements && improvements !== 'No') {
+                plainText += `We've identified several strategic opportunities where ${improvements}. These are exactly the types of challenges Online Optimism excels at solving.\n\n`;
             } else {
-                schpiel += `We've identified several strategic opportunities where Online Optimism's expertise could really make a difference.\n\n`;
+                plainText += `We've identified several strategic opportunities where Online Optimism's expertise could really make a difference.\n\n`;
             }
             
-            if (notes) {
-                schpiel += `[Additional Context]\n${notes}\n\n`;
+            if (notes && notes !== 'No notes') {
+                plainText += `[Additional Context]\n${notes}\n\n`;
             }
             
-            schpiel += `[Next Steps]\n`;
-            schpiel += `All that to say, I want to make the most of our time together today. We can approach this conversation in two ways: I'm happy to answer any questions you have about Online Optimism and how we work, or I can dive into learning more about ${client} with some strategic questions I've prepared to determine if we're the right fit for each other. What would be most valuable for you?`;
+            plainText += `[Next Steps]\n`;
+            plainText += `All that to say, I want to make the most of our time together today. We can approach this conversation in two ways: I'm happy to answer any questions you have about Online Optimism and how we work, or I can dive into learning more about ${client} with some strategic questions I've prepared to determine if we're the right fit for each other. What would be most valuable for you?`;
             
-            currentSchpiel = schpiel;
+            currentSchpiel = plainText;
             
-            // Update output
-            document.getElementById('schpielContent').textContent = schpiel;
+            // Update output with HTML version
+            document.getElementById('schpielContent').innerHTML = schpielHTML;
             document.getElementById('outputClient').textContent = client;
-            document.getElementById('generatedDate').textContent = new Date().toLocaleDateString();
+            document.getElementById('generatedDate').textContent = new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
         }
         
         function copyToClipboard() {
@@ -936,10 +1059,112 @@
             setTimeout(() => btn.style.animation = '', 500);
         }
         
+        function editInputs() {
+            switchTab('input');
+        }
+        
+        function shareLink() {
+            // Build URL with current form values
+            const params = new URLSearchParams();
+            
+            const client = document.getElementById('clientName').value;
+            const contact = document.getElementById('contactName').value;
+            const industry = document.getElementById('industry').value;
+            const referral = document.getElementById('referralSource').value;
+            const social = document.getElementById('socialPlatforms').value;
+            const strengths = document.getElementById('strengths').value;
+            const improvements = document.getElementById('improvements').value;
+            const notes = document.getElementById('additionalNotes').value;
+            const tone = document.querySelector('.tone-option.selected').dataset.tone;
+            
+            if (client) params.append('client', client);
+            if (contact) params.append('contact', contact);
+            if (industry) params.append('industry', industry);
+            if (referral) params.append('referral', referral);
+            if (social) params.append('social', social);
+            if (strengths) params.append('strengths', strengths);
+            if (improvements) params.append('improvements', improvements);
+            if (notes) params.append('notes', notes);
+            if (tone) params.append('tone', tone);
+            
+            const shareUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + params.toString();
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                const btn = event.target.closest('.action-btn');
+                btn.classList.add('success');
+                btn.innerHTML = '<span>✓</span><span>Link Copied!</span>';
+                setTimeout(() => {
+                    btn.classList.remove('success');
+                    btn.innerHTML = '<span>🔗</span><span>Share Link</span>';
+                }, 2000);
+            });
+        }
+        
         function clearForm() {
             document.getElementById('schpielForm').reset();
             document.querySelectorAll('.tone-option').forEach(opt => opt.classList.remove('selected'));
             document.querySelector('.tone-option[data-tone="professional"]').classList.add('selected');
+        }
+        
+        function handleURLParameters(urlParams) {
+            // Fill form with URL parameters
+            if (urlParams.get('client')) {
+                document.getElementById('clientName').value = urlParams.get('client');
+            }
+            if (urlParams.get('contact') && urlParams.get('contact') !== 'No') {
+                document.getElementById('contactName').value = urlParams.get('contact');
+            }
+            if (urlParams.get('industry') && urlParams.get('industry') !== 'No') {
+                document.getElementById('industry').value = urlParams.get('industry');
+            }
+            if (urlParams.get('referral') && urlParams.get('referral') !== 'No') {
+                document.getElementById('referralSource').value = urlParams.get('referral');
+            }
+            if (urlParams.get('social') && urlParams.get('social') !== 'No social') {
+                document.getElementById('socialPlatforms').value = urlParams.get('social');
+            }
+            if (urlParams.get('strengths') && urlParams.get('strengths') !== 'No Strengths') {
+                document.getElementById('strengths').value = urlParams.get('strengths');
+            }
+            if (urlParams.get('improvements') && urlParams.get('improvements') !== 'No') {
+                document.getElementById('improvements').value = urlParams.get('improvements');
+            }
+            if (urlParams.get('notes') && urlParams.get('notes') !== 'No notes') {
+                document.getElementById('additionalNotes').value = urlParams.get('notes');
+            }
+            
+            // Set tone
+            if (urlParams.get('tone')) {
+                document.querySelectorAll('.tone-option').forEach(opt => opt.classList.remove('selected'));
+                const toneElement = document.querySelector(`.tone-option[data-tone="${urlParams.get('tone')}"]`);
+                if (toneElement) {
+                    toneElement.classList.add('selected');
+                }
+            }
+            
+            // Auto-generate if requested
+            if (urlParams.get('auto') === 'true' || urlParams.get('generate') === 'true') {
+                // Generate immediately
+                setTimeout(() => {
+                    generateSchpiel();
+                    switchTab('output');
+                }, 500);
+            } else {
+                // Show loading briefly then generate
+                document.getElementById('inputTab').style.display = 'none';
+                document.getElementById('loading').classList.add('active');
+                
+                setTimeout(() => {
+                    generateSchpiel();
+                    document.getElementById('loading').classList.remove('active');
+                    switchTab('output');
+                    
+                    // Update URL to remove parameters for cleaner sharing
+                    const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                }, 1500);
+            }
         }
     </script>
 </body>
