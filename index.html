@@ -1,915 +1,188 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Optimism - AI-Powered Schpiel Generator API</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        body.json-mode {
-            background: white;
-            padding: 10px;
-        }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: pulse 4s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
-        
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1em;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .ai-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            margin-top: 10px;
-            font-size: 0.9em;
-            backdrop-filter: blur(10px);
-        }
-        
-        .api-status {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #28a745;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            z-index: 2;
-        }
-        
-        .content {
-            padding: 40px;
-        }
-        
-        .input-section {
-            margin-bottom: 40px;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-        }
-        
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-        
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        
-        .tone-selector {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .tone-option {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s;
-        }
-        
-        .tone-option:hover {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.05);
-        }
-        
-        .tone-option.selected {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-            font-weight: 600;
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        button {
-            flex: 1;
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        
-        button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        .secondary-btn {
-            background: #6c757d;
-        }
-        
-        .output-section {
-            margin-top: 40px;
-            padding-top: 40px;
-            border-top: 2px solid #e0e0e0;
-            animation: slideIn 0.5s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+    <title>Schpiel Generator API</title>
+    <script>
+        // This runs immediately to handle webhook requests
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Check if this is an automated API call
+            if (urlParams.get('auto') === 'true' && urlParams.get('client')) {
+                const clientData = {
+                    "Healthcare": ["504 Health Net", "Access Health", "Big Easy Medical", "Doctors Imaging", "MidCity TMS", "Southern ENT Associates", "Magnolia PT", "Medcentris", "St. Thomas Community Health Center"],
+                    "Legal": ["Guarisco Cordes Lala", "Kruger& Hodges", "Law Office of Lance J. Robinson", "Kuchler Polk Weiner", "Valor Firm Client Square"],
+                    "Financial": ["Crescent Bank", "First Bank", "Hibernia Bank", "Pelicoin", "OneMain", "Rent Reporters", "Tapcheck"],
+                    "Education": ["Crescent City Schools", "Tulane I I H E", "University View Academy", "Louisiana School", "Valor Academy", "YCP"],
+                    "Nonprofit": ["American Bird Conservancy", "Camp Restore", "EPNO", "Network Volunteers", "The Data Center"],
+                    "Hospitality": ["Chateau Le Moyne", "Le Petit Theatre", "Red Horse Inn", "Lafitte Guest House", "Royal Heritage"],
+                    "Real Estate": ["1201 Canal", "Four Winds", "Grand River", "Property One", "Wharf"],
+                    "Food & Beverage": ["Cafe Beignet", "Dixie Beer", "Elysian Bar", "La Boca", "Miette", "Dragonfly Cafe"],
+                    "Technology": ["Guardian Computer", "ID Scan", "Synergy", "Olive", "Trademark Media"],
+                    "Retail": ["Acadian Windows", "Eisenhower Consignment", "Miette", "Bauhaus Salon"],
+                    "Manufacturing": ["Armana Productions", "Craft Kettle", "Good Wood Nola", "Oracle Lighting", "Royal Coatings"],
+                    "Construction": ["Bollinger Shipyards", "Gallo Mechanical", "Hummel Construction", "Landis Construction", "StrongBuilt Construction"],
+                    "Wellness": ["Breathing Deeply", "Hair Loft", "Nerd Fitness"],
+                    "Automotive": ["Superior Honda"],
+                    "Media & Entertainment": ["Moxie Media", "The Swan Princess", "W W O Z"],
+                    "Professional Services": ["Cardinal Expo", "DIY Pest Control", "GoodBee", "STM Bags", "York"],
+                    "E-commerce": ["Passion Lillie", "Saint Hugh"],
+                    "Tourism": ["Unique Nola"],
+                    "Government": ["Downtown Development District", "JPFA", "NORPC", "Warren Montgomery, District Attorney"]
+                };
+                
+                // Get parameters
+                const client = urlParams.get('client') || 'Your Company';
+                const industry = urlParams.get('industry') || '';
+                const contact = urlParams.get('contact') || '';
+                const referral = urlParams.get('referral') || '';
+                const social = urlParams.get('social') || '';
+                const strengths = urlParams.get('strengths') || '';
+                const improvements = urlParams.get('improvements') || '';
+                const notes = urlParams.get('notes') || '';
+                const format = urlParams.get('format') || 'json';
+                
+                // Variation arrays for dynamic content
+                const intros = [
+                    "I'm Flynn, CEO of Online Optimism. I founded the agency in 2012 by myself. Since then, we've grown to a team of twenty full-time employees",
+                    "Hi, I'm Flynn, founder and CEO of Online Optimism. What started as a solo venture in 2012 has evolved into a dynamic team of twenty professionals",
+                    "I'm Flynn, and I lead Online Optimism. From humble beginnings in 2012, we've built a dedicated team of twenty digital marketing experts"
+                ];
+                
+                const locations = [
+                    "based around the East Coast and Gulf Coast",
+                    "distributed across the Eastern seaboard and Gulf region",
+                    "with team members from New Orleans to New York"
+                ];
+                
+                const work = [
+                    "working for thirty to forty clients at a time with their digital marketing & creative efforts",
+                    "partnering with 30-40 businesses on their digital transformation journeys",
+                    "managing comprehensive digital strategies for dozens of clients simultaneously"
+                ];
+                
+                // Build schpiel with variations
+                let schpiel = "[Introduction]\n";
+                schpiel += intros[Math.floor(Math.random() * intros.length)] + ", ";
+                schpiel += locations[Math.floor(Math.random() * locations.length)] + ", ";
+                schpiel += work[Math.floor(Math.random() * work.length)] + ".\n\n";
+                
+                // Industry section
+                if (industry && clientData[industry]) {
+                    schpiel += `We have extensive experience in the ${industry} space, which gives us unique insights into your market.\n\n`;
+                    const examples = clientData[industry].sort(() => 0.5 - Math.random()).slice(0, 2);
+                    if (examples.length > 0) {
+                        schpiel += `Some of our ${industry.toLowerCase()} clients include ${examples.join(' and ')}, giving us deep insights into what works in your market.\n\n`;
+                    }
+                } else {
+                    schpiel += "We've worked with over 170 clients across diverse industries, bringing cross-sector insights that often lead to breakthrough strategies.\n\n";
+                    // Pull random examples from different industries
+                    const randomExamples = [
+                        clientData['Healthcare']?.[Math.floor(Math.random() * clientData['Healthcare'].length)],
+                        clientData['Financial']?.[Math.floor(Math.random() * clientData['Financial'].length)],
+                        clientData['Hospitality']?.[Math.floor(Math.random() * clientData['Hospitality'].length)]
+                    ].filter(Boolean);
+                    if (randomExamples.length > 0) {
+                        schpiel += `Our portfolio includes companies like ${randomExamples.join(', ')}, showcasing our versatility and expertise.\n\n`;
+                    }
+                }
+                
+                // Client focus section
+                schpiel += `[Focus on ${client}]\n`;
+                
+                if (referral) {
+                    schpiel += `Before this conversation, our team reviewed the notes from ${referral}, as well as your online presence, to make this meeting as efficient as possible since we know your time is valuable.\n\n`;
+                } else {
+                    schpiel += "Before this conversation, our team reviewed your online presence to make this meeting as efficient as possible since we know your time is valuable.\n\n";
+                }
+                
+                // Social media analysis
+                if (social) {
+                    const platforms = social.split(',').map(p => p.trim());
+                    schpiel += `We analyzed your presence across ${platforms.length} platforms including ${platforms.slice(0, 3).join(', ')}. `;
+                    schpiel += "We've done a comprehensive analysis of your content strategy, engagement metrics, and competitive positioning.\n\n";
+                } else {
+                    schpiel += "We've conducted a thorough review of your digital footprint to understand your current market position.\n\n";
+                }
+                
+                // Strengths section
+                schpiel += "[Strengths & Observations]\n";
+                if (strengths) {
+                    schpiel += `You've clearly built something impressive with ${client}. ${strengths}.\n\n`;
+                } else {
+                    schpiel += `You've clearly built something impressive with ${client}. Your commitment to excellence is clear, and there's obvious potential for growth.\n\n`;
+                }
+                
+                // Improvements section
+                schpiel += "[Growth Opportunities]\n";
+                if (improvements) {
+                    schpiel += `We've identified several strategic opportunities where ${improvements}. `;
+                    schpiel += "These are exactly the types of challenges Online Optimism excels at solving.\n\n";
+                } else {
+                    schpiel += "We've identified several strategic opportunities where Online Optimism's expertise could really make a difference. ";
+                    schpiel += "Based on our initial review, there are several high-impact strategies we could implement quickly.\n\n";
+                }
+                
+                // Additional notes
+                if (notes) {
+                    schpiel += `[Additional Context]\n${notes}\n\n`;
+                }
+                
+                // Closing
+                const closings = [
+                    `All that to say, I want to make the most of our time together today. We can approach this conversation in two ways: I'm happy to answer any questions you have about Online Optimism and how we work, or I can dive into learning more about ${client} with some strategic questions I've prepared to determine if we're the right fit for each other. What would be most valuable for you?`,
+                    `So here's where we are - I can tell you more about Online Optimism and our approach, or we can focus on ${client} and explore whether there's a good match between what you need and what we offer. Which direction feels right to you?`,
+                    `Now, let's make this conversation work for you. Would you prefer to hear more about our agency and process, or should I jump into my questions about ${client} to see how we might be able to help? I'm ready either way.`
+                ];
+                
+                schpiel += "[Next Steps]\n";
+                schpiel += closings[Math.floor(Math.random() * closings.length)];
+                
+                // Output based on format
+                if (format === 'json') {
+                    const jsonResponse = {
+                        success: true,
+                        clientName: client,
+                        contactName: contact,
+                        industry: industry,
+                        referralSource: referral,
+                        socialPlatforms: social,
+                        strengths: strengths,
+                        improvements: improvements,
+                        additionalNotes: notes,
+                        schpielText: schpiel,
+                        generatedAt: new Date().toISOString(),
+                        version: "2.1"
+                    };
+                    
+                    document.write(JSON.stringify(jsonResponse, null, 2));
+                    document.close();
+                } else if (format === 'text') {
+                    document.write(schpiel);
+                    document.close();
+                } else {
+                    // Default HTML output
+                    document.write('<pre>' + schpiel + '</pre>');
+                    document.close();
+                }
+            } else {
+                // No parameters or not auto - show basic instructions
+                document.write('<h1>Schpiel Generator API</h1>');
+                document.write('<p>This endpoint requires parameters:</p>');
+                document.write('<ul>');
+                document.write('<li>client (required)</li>');
+                document.write('<li>auto=true (required)</li>');
+                document.write('<li>format=json (recommended)</li>');
+                document.write('<li>industry, contact, referral, social, strengths, improvements, notes (optional)</li>');
+                document.write('</ul>');
+                document.write('<p>Example: ?client=TestCompany&industry=Healthcare&format=json&auto=true</p>');
+                document.close();
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .schpiel-output {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 25px;
-            min-height: 200px;
-            white-space: pre-wrap;
-            line-height: 1.8;
-            font-size: 15px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .status {
-            padding: 15px 20px;
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            color: #155724;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .api-section {
-            background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        
-        .api-section h3 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-        
-        .api-endpoint {
-            background: white;
-            padding: 10px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 14px;
-            word-break: break-all;
-            margin-top: 10px;
-        }
-        
-        .client-showcase {
-            background: rgba(102, 126, 234, 0.05);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        
-        .client-showcase h4 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-        
-        .client-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .client-pill {
-            background: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .json-output {
-            font-family: monospace;
-            white-space: pre-wrap;
-            padding: 20px;
-            background: #f5f5f5;
-            border-radius: 8px;
-        }
-        
-        .api-docs {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        
-        .api-docs h4 {
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-        
-        .api-docs code {
-            background: #e9ecef;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: monospace;
-        }
-        
-        .api-example {
-            background: #2d2d2d;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
-            overflow-x: auto;
-        }
-    </style>
+        })();
+    </script>
 </head>
 <body>
-    <div class="container" id="mainContainer">
-        <div class="header">
-            <div class="api-status">API Ready</div>
-            <h1>AI-Powered Schpiel Generator</h1>
-            <p>Online Optimism - Pre-Discovery Call Assistant</p>
-            <div class="ai-badge">✨ Webhook & API Enabled</div>
-        </div>
-        
-        <div class="content">
-            <div class="input-section">
-                <div class="input-group">
-                    <label for="clientName">Client/Company Name *</label>
-                    <input type="text" id="clientName" placeholder="e.g., Dr. Smith's Practice">
-                </div>
-                
-                <div class="input-group">
-                    <label for="contactName">Contact Person</label>
-                    <input type="text" id="contactName" placeholder="e.g., Dr. Jane Smith">
-                </div>
-                
-                <div class="input-group">
-                    <label for="industry">Industry</label>
-                    <select id="industry">
-                        <option value="">Select Industry</option>
-                        <option value="Healthcare">Healthcare</option>
-                        <option value="Legal">Legal Services</option>
-                        <option value="Financial">Financial Services</option>
-                        <option value="Education">Education</option>
-                        <option value="Nonprofit">Nonprofit</option>
-                        <option value="Hospitality">Hospitality</option>
-                        <option value="Real Estate">Real Estate</option>
-                        <option value="Food & Beverage">Food & Beverage</option>
-                        <option value="Technology">Technology</option>
-                        <option value="Retail">Retail</option>
-                        <option value="Manufacturing">Manufacturing</option>
-                        <option value="Construction">Construction</option>
-                        <option value="Wellness">Wellness</option>
-                        <option value="Automotive">Automotive</option>
-                        <option value="Media & Entertainment">Media & Entertainment</option>
-                        <option value="Professional Services">Professional Services</option>
-                        <option value="E-commerce">E-commerce</option>
-                        <option value="Tourism">Tourism</option>
-                        <option value="Government">Government</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                
-                <div class="input-group">
-                    <label for="referralSource">Referral Source</label>
-                    <input type="text" id="referralSource" placeholder="e.g., Josh at Sculpt">
-                </div>
-                
-                <div class="input-group">
-                    <label for="socialPlatforms">Social Media Platforms (comma separated)</label>
-                    <input type="text" id="socialPlatforms" placeholder="e.g., Instagram, Facebook, LinkedIn, TikTok">
-                </div>
-                
-                <div class="input-group">
-                    <label for="strengths">Notable Strengths/Achievements</label>
-                    <textarea id="strengths" placeholder="e.g., Strong partnerships with major brands, successful community engagement"></textarea>
-                </div>
-                
-                <div class="input-group">
-                    <label for="improvements">Areas for Improvement</label>
-                    <textarea id="improvements" placeholder="e.g., Sponsored content engagement, posting consistency"></textarea>
-                </div>
-                
-                <div class="input-group">
-                    <label for="additionalNotes">Additional Notes/Context</label>
-                    <textarea id="additionalNotes" placeholder="Any other relevant information about the client"></textarea>
-                </div>
-                
-                <div class="input-group">
-                    <label>Conversation Tone</label>
-                    <div class="tone-selector">
-                        <div class="tone-option selected" data-tone="professional">Professional</div>
-                        <div class="tone-option" data-tone="friendly">Friendly</div>
-                        <div class="tone-option" data-tone="enthusiastic">Enthusiastic</div>
-                    </div>
-                </div>
-                
-                <div class="button-group">
-                    <button onclick="generateSchpiel()">Generate Unique Schpiel</button>
-                    <button class="secondary-btn" onclick="clearForm()">Clear Form</button>
-                </div>
-            </div>
-            
-            <div class="client-showcase">
-                <h4>Our Portfolio Includes 170+ Clients Across Industries</h4>
-                <div class="client-grid" id="clientShowcase"></div>
-            </div>
-            
-            <div class="output-section hidden" id="outputSection">
-                <div class="status">✨ AI-Generated Schpiel Ready!</div>
-                <h2 style="margin-bottom: 20px;">Your Custom Schpiel:</h2>
-                <div class="schpiel-output" id="schpielOutput"></div>
-                <div class="button-group">
-                    <button onclick="copyToClipboard()">Copy to Clipboard</button>
-                    <button onclick="generateSchpiel()">Regenerate with Variation</button>
-                    <button onclick="exportAsJSON()">Export as JSON</button>
-                </div>
-            </div>
-            
-            <div class="api-docs">
-                <h4>📡 API Documentation for Zapier Integration</h4>
-                
-                <h5>Method 1: GET Request (Simple)</h5>
-                <div class="api-example">
-GET /?client=CompanyName&industry=Healthcare&format=json&auto=true
-                </div>
-                
-                <h5>Method 2: POST Request (Recommended for Zapier)</h5>
-                <div class="api-example">
-POST /
-Content-Type: application/x-www-form-urlencoded
-
-client=CompanyName&contact=ContactName&industry=Healthcare&format=json&auto=true
-                </div>
-                
-                <h5>Response Formats:</h5>
-                <ul>
-                    <li><code>format=json</code> - Returns JSON response only</li>
-                    <li><code>format=html</code> - Returns full HTML page (default)</li>
-                    <li><code>format=text</code> - Returns plain text schpiel only</li>
-                    <li><code>auto=true</code> - Auto-generates on load</li>
-                </ul>
-                
-                <h5>Zapier Webhook Configuration:</h5>
-                <div class="api-example">
-Action: Webhooks by Zapier - POST
-URL: https://your-domain.com/
-Payload Type: form
-Data:
-  client|{{1__company_name}}
-  industry|{{1__industry}}
-  format|json
-  auto|true
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <script>
-        // Actual Online Optimism client data from CSV
-        const clientData = {
-            "Healthcare": ["504 Health Net", "Access Health", "Big Easy Medical", "Doctors For America", "Doctors Imaging", "Empire State Health Partners Client Square", "Englewood Health", "Florman Tannen", "Health in Tech", "Hospice of South Louisiana", "Magnolia PT", "Medcentris", "MidCity TMS", "Southern ENT Associates", "St. Thomas Community Health Center", "Vetnaturally"],
-            "Legal": ["Guarisco Cordes Lala", "Kruger& Hodges", "Kuchler Polk Weiner", "Law Office of Lance J. Robinson", "Valor Firm Client Square"],
-            "Financial": ["Crescent Bank", "First Bank", "Hibernia Bank", "JPFA Jefferson Parish Finance Authority", "OneMain", "Pelicoin", "Rent Reporters", "Tapcheck"],
-            "Education": ["A O North America A O N A", "Blackhawk Flight Foundation", "Breathing Deeply", "Credential Engine", "Crescent City Schools", "Entergy", "Louisiana Endowment for the Humanities", "Louisiana School", "Louisiana School Client Square", "Nerd Fitness", "Office of Cultural Affairs", "Program Managers of America", "Raphael Village", "Tulane I I H E", "University View Academy", "Valor Academy", "YCP"],
-            "Nonprofit": ["504 Health Net", "American Bird Conservancy", "Big Easy Medical", "Blackhawk Flight Foundation", "Bring Your Own Stories", "Camp Restore", "Credential Engine", "Doctors For America", "EPNO", "NCTA", "Network Volunteers", "Raphael Village", "Space to Reach", "The Data Center", "Tulane I I H E", "W W O Z"],
-            "Hospitality": ["Bauhaus Salon", "Carrollton Station", "Chateau Le Moyne", "Clandestine", "Couvant", "Elysian Bar", "Hotel St Marie", "Lafitte Guest House", "Lamps Lighting", "Le Petit Theatre", "Le Petit Theatre Client Square", "Noto's", "Party Go Round", "Red Horse Inn", "Royal Heritage", "Selfie Spot Nola"],
-            "Real Estate": ["1201 Canal", "Adamick Architecture", "Bon Vi", "Downtown Development District", "Four Winds", "Grand River", "Lighthouse Wealth Preservation", "Lumar", "Northgate Land Dev", "Property One", "Wharf"],
-            "Food & Beverage": ["Cafe Beignet", "Dixie Beer", "Dragonfly Cafe", "El Guapo", "Elysian Bar", "Happy Jaxx", "La Boca", "Max Cases", "Miette", "Noto's", "Red Horse Inn", "Southern Craft Brewing"],
-            "Technology": ["Adamick Architecture", "Guardian Computer", "ID Scan", "NCTA", "Olive", "Pro Vision Sports", "Synergy", "Technology Policy Institute", "Trademark Media"],
-            "Retail": ["Acadian Windows", "Armana Productions", "Bauhaus Salon", "Eisenhower Consignment", "Miette"],
-            "Manufacturing": ["Armana Productions", "Craft Kettle", "El Guapo", "Good Wood Nola", "Oracle Lighting", "Royal Coatings"],
-            "Construction": ["Bollinger Shipyards", "Gallo Mechanical", "Hummel Construction", "Landis Construction", "Marchand Creative Kitchens", "Northgate Land Dev", "StrongBuilt Construction"],
-            "Wellness": ["Breathing Deeply", "Hair Loft", "Nerd Fitness"],
-            "Automotive": ["Superior Honda"],
-            "Media & Entertainment": ["Moxie Media", "The Swan Princess", "W W O Z"],
-            "Professional Services": ["Acadian Windows", "Cardinal Expo", "DIY Pest Control", "GoodBee", "Hair Loft", "Hammer and Nails Grooming", "Lighthouse Wealth Preservation", "Renew1", "STM Bags", "Trademark Media", "Uprooting Racism", "York"],
-            "E-commerce": ["Passion Lillie", "Saint Hugh"],
-            "Tourism": ["Unique Nola"],
-            "Government": ["Downtown Development District", "JPFA Jefferson Parish Finance Authority", "NORPC", "Technology Policy Institute", "Warren Montgomery, District Attorney"]
-        };
-        
-        // AI variation phrases for dynamic content
-        const aiVariations = {
-            introductions: [
-                "I'm Flynn, CEO of Online Optimism. I founded the agency in 2012 by myself. Since then, we've grown to a team of twenty full-time employees",
-                "Hi, I'm Flynn, founder and CEO of Online Optimism. What started as a solo venture in 2012 has evolved into a dynamic team of twenty professionals",
-                "I'm Flynn, and I lead Online Optimism. From humble beginnings in 2012, we've built a dedicated team of twenty digital marketing experts",
-                "Flynn here, CEO of Online Optimism. Over the past 13 years, we've grown from a one-person operation to a thriving agency of twenty specialists"
-            ],
-            teamLocation: [
-                "based around the East Coast and Gulf Coast",
-                "distributed across the Eastern seaboard and Gulf region",
-                "with team members from New Orleans to New York",
-                "spanning from Louisiana to the East Coast"
-            ],
-            clientWork: [
-                "working for thirty to forty clients at a time with their digital marketing & creative efforts",
-                "partnering with 30-40 businesses on their digital transformation journeys",
-                "managing comprehensive digital strategies for dozens of clients simultaneously",
-                "helping 30-40 companies excel in the digital landscape"
-            ],
-            industryExperience: {
-                professional: [
-                    "We have extensive experience in the {industry} space, which gives us unique insights into your market",
-                    "Our deep expertise in {industry} allows us to understand the specific challenges you face",
-                    "We've developed specialized strategies for {industry} clients that consistently deliver results"
-                ],
-                friendly: [
-                    "We absolutely love working with {industry} businesses - it's one of our favorite sectors",
-                    "The {industry} space is where we really shine, and we're excited about what we could do together",
-                    "We've had great success helping {industry} companies like yours grow their digital presence"
-                ],
-                enthusiastic: [
-                    "We're passionate about {industry} marketing - it's an area where we've seen incredible transformations",
-                    "The {industry} sector is so dynamic, and we thrive on helping businesses like yours stand out",
-                    "We get genuinely excited about {industry} projects because the impact potential is huge"
-                ]
-            },
-            researchIntro: [
-                "Before this conversation, our team reviewed",
-                "In preparation for today, we took a deep dive into",
-                "To make the most of our time, we've already analyzed",
-                "Our team has done our homework and reviewed"
-            ],
-            timeValue: [
-                "to make this meeting as efficient as possible since we know your time is valuable",
-                "because we respect your time and want this conversation to be worthwhile",
-                "to ensure we can have a focused, productive discussion",
-                "so we can jump right into what matters most for your business"
-            ],
-            positiveObservations: {
-                professional: [
-                    "You've clearly built something impressive with",
-                    "Your achievements in this space are noteworthy",
-                    "The quality of your work is evident"
-                ],
-                friendly: [
-                    "We're really impressed by what you've accomplished",
-                    "You're doing some fantastic things with",
-                    "It's clear you've put a lot of heart into"
-                ],
-                enthusiastic: [
-                    "Wow, you're absolutely crushing it with",
-                    "We're blown away by",
-                    "You're setting the bar high with"
-                ]
-            },
-            improvements: {
-                professional: [
-                    "We've identified several strategic opportunities where",
-                    "There are some areas where targeted improvements could",
-                    "We noticed potential for optimization in"
-                ],
-                friendly: [
-                    "We spotted a few areas where we could really help",
-                    "There are some exciting opportunities to",
-                    "We have some ideas about how to"
-                ],
-                enthusiastic: [
-                    "We're excited about the potential to dramatically improve",
-                    "There's so much room to grow in",
-                    "We can't wait to help you transform"
-                ]
-            },
-            closingQuestion: [
-                "All that to say, I want to make the most of our time together today. We can approach this conversation in two ways: I'm happy to answer any questions you have about Online Optimism and how we work, or I can dive into learning more about {client} with some strategic questions I've prepared to determine if we're the right fit for each other. What would be most valuable for you?",
-                "So here's where we are - I can tell you more about Online Optimism and our approach, or we can focus on {client} and explore whether there's a good match between what you need and what we offer. Which direction feels right to you?",
-                "Now, let's make this conversation work for you. Would you prefer to hear more about our agency and process, or should I jump into my questions about {client} to see how we might be able to help? I'm ready either way.",
-                "I want to be respectful of your time and make sure you get what you need from this call. Should I share more about Online Optimism's capabilities, or would you rather I ask some targeted questions about {client}'s goals and challenges? Your call."
-            ]
-        };
-        
-        // Function to get URL parameters
-        function getUrlParams() {
-            const params = {};
-            const searchParams = new URLSearchParams(window.location.search);
-            
-            // Check for POST data if available
-            if (window.location.hash) {
-                const hashParams = new URLSearchParams(window.location.hash.substring(1));
-                for (let [key, value] of hashParams) {
-                    params[key] = decodeURIComponent(value);
-                }
-            }
-            
-            // Get URL parameters
-            for (let [key, value] of searchParams) {
-                params[key] = decodeURIComponent(value);
-            }
-            
-            return params;
-        }
-        
-        // Function to handle form data from POST request
-        function handlePostData() {
-            // This would normally require server-side processing
-            // For client-side only, we'll use URL parameters
-            const params = getUrlParams();
-            
-            if (params.client) document.getElementById('clientName').value = params.client;
-            if (params.contact) document.getElementById('contactName').value = params.contact;
-            if (params.industry) document.getElementById('industry').value = params.industry;
-            if (params.referral) document.getElementById('referralSource').value = params.referral;
-            if (params.social) document.getElementById('socialPlatforms').value = params.social;
-            if (params.strengths) document.getElementById('strengths').value = params.strengths;
-            if (params.improvements) document.getElementById('improvements').value = params.improvements;
-            if (params.notes) document.getElementById('additionalNotes').value = params.notes;
-            if (params.tone) {
-                document.querySelectorAll('.tone-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                    if (opt.dataset.tone === params.tone) {
-                        opt.classList.add('selected');
-                    }
-                });
-            }
-            
-            return params;
-        }
-        
-        // Helper function to get random element from array
-        function getRandom(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
-        }
-        
-        // Helper function to get random clients from category
-        function getRandomClients(category, count = 2) {
-            const clients = clientData[category] || [];
-            const shuffled = [...clients].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, count);
-        }
-        
-        // Show sample clients on load
-        function showClientShowcase() {
-            const showcase = document.getElementById('clientShowcase');
-            const sampleClients = [
-                "Dixie Beer", "Southern ENT Associates", "Crescent Bank", "Superior Honda",
-                "Le Petit Theatre", "American Bird Conservancy", "Bollinger Shipyards", "Guardian Computer"
-            ];
-            
-            showcase.innerHTML = sampleClients.map(client => 
-                `<div class="client-pill">${client}</div>`
-            ).join('');
-        }
-        
-        // Tone selector functionality
-        document.querySelectorAll('.tone-option').forEach(option => {
-            option.addEventListener('click', function() {
-                document.querySelectorAll('.tone-option').forEach(o => o.classList.remove('selected'));
-                this.classList.add('selected');
-            });
-        });
-        
-        function generateSchpiel() {
-            const clientName = document.getElementById('clientName').value;
-            const contactName = document.getElementById('contactName').value;
-            const industry = document.getElementById('industry').value;
-            const referralSource = document.getElementById('referralSource').value;
-            const socialPlatforms = document.getElementById('socialPlatforms').value;
-            const strengths = document.getElementById('strengths').value;
-            const improvements = document.getElementById('improvements').value;
-            const additionalNotes = document.getElementById('additionalNotes').value;
-            const tone = document.querySelector('.tone-option.selected').dataset.tone;
-            
-            if (!clientName) {
-                alert('Please enter at least the client/company name');
-                return;
-            }
-            
-            // Build AI-powered dynamic schpiel
-            let schpiel = `[Introduction]\n`;
-            
-            // Dynamic introduction
-            const intro = getRandom(aiVariations.introductions);
-            const location = getRandom(aiVariations.teamLocation);
-            const work = getRandom(aiVariations.clientWork);
-            schpiel += `${intro}, ${location}, ${work}.\n\n`;
-            
-            // Industry experience with actual clients
-            if (industry && clientData[industry]) {
-                const industryPhrase = getRandom(aiVariations.industryExperience[tone]);
-                schpiel += industryPhrase.replace('{industry}', industry) + `.\n\n`;
-                
-                const exampleClients = getRandomClients(industry, 2);
-                if (exampleClients.length > 0) {
-                    schpiel += `Some of our ${industry.toLowerCase()} clients include ${exampleClients.join(' and ')}, `;
-                    schpiel += `giving us deep insights into what works in your market.\n\n`;
-                }
-            } else {
-                schpiel += `We've worked with over 170 clients across diverse industries, bringing cross-sector insights that often lead to breakthrough strategies.\n\n`;
-                
-                // Show random impressive clients
-                const randomClients = [
-                    getRandom(clientData['Healthcare'] || []),
-                    getRandom(clientData['Financial'] || []),
-                    getRandom(clientData['Hospitality'] || [])
-                ].filter(c => c);
-                
-                if (randomClients.length > 0) {
-                    schpiel += `Our portfolio includes companies like ${randomClients.join(', ')}, showcasing our versatility and expertise.\n\n`;
-                }
-            }
-            
-            // Transition to client focus
-            schpiel += `[Focus on ${clientName}]\n`;
-            
-            // Research section
-            const researchIntro = getRandom(aiVariations.researchIntro);
-            const timePhrase = getRandom(aiVariations.timeValue);
-            
-            if (referralSource) {
-                schpiel += `${researchIntro} the notes from ${referralSource}, as well as your online presence, ${timePhrase}.\n\n`;
-            } else {
-                schpiel += `${researchIntro} your online presence ${timePhrase}.\n\n`;
-            }
-            
-            // Social media analysis
-            if (socialPlatforms) {
-                const platforms = socialPlatforms.split(',').map(p => p.trim());
-                if (platforms.length > 3) {
-                    schpiel += `We analyzed your presence across ${platforms.length} platforms including ${platforms.slice(0, 3).join(', ')} and others. `;
-                } else {
-                    schpiel += `We looked at your ${platforms.join(', ')} presence. `;
-                }
-                schpiel += `We've done a comprehensive analysis of your content strategy, engagement metrics, and competitive positioning.\n\n`;
-            } else {
-                schpiel += `We've conducted a thorough review of your digital footprint to understand your current market position.\n\n`;
-            }
-            
-            // Positive observations
-            schpiel += `[Strengths & Observations]\n`;
-            const positivePrefix = getRandom(aiVariations.positiveObservations[tone]);
-            
-            if (strengths) {
-                schpiel += `${positivePrefix} ${clientName}. ${strengths}.\n\n`;
-            } else {
-                schpiel += `${positivePrefix} ${clientName}. Your commitment to excellence is clear, and there's obvious potential for growth.\n\n`;
-            }
-            
-            // Areas for improvement
-            schpiel += `[Growth Opportunities]\n`;
-            const improvementPrefix = getRandom(aiVariations.improvements[tone]);
-            
-            if (improvements) {
-                schpiel += `${improvementPrefix} ${improvements}. `;
-                schpiel += `These are exactly the types of challenges Online Optimism excels at solving.\n\n`;
-            } else {
-                schpiel += `${improvementPrefix} your digital marketing impact. `;
-                schpiel += `Based on our initial review, there are several high-impact strategies we could implement quickly.\n\n`;
-            }
-            
-            // Additional context
-            if (additionalNotes) {
-                schpiel += `[Additional Context]\n${additionalNotes}\n\n`;
-            }
-            
-            // Dynamic closing
-            schpiel += `[Next Steps]\n`;
-            const closing = getRandom(aiVariations.closingQuestion);
-            schpiel += closing.replace(/{client}/g, clientName);
-            
-            // Store for export
-            window.currentSchpiel = {
-                success: true,
-                clientName: clientName,
-                contactName: contactName,
-                industry: industry,
-                referralSource: referralSource,
-                socialPlatforms: socialPlatforms,
-                strengths: strengths,
-                improvements: improvements,
-                additionalNotes: additionalNotes,
-                tone: tone,
-                schpielText: schpiel,
-                schpielFormatted: schpiel,
-                generatedAt: new Date().toISOString(),
-                aiGenerated: true,
-                version: "2.0"
-            };
-            
-            // Check if we should return JSON, text, or HTML
-            const params = getUrlParams();
-            if (params.format === 'json') {
-                document.body.innerHTML = `<pre class="json-output">${JSON.stringify(window.currentSchpiel, null, 2)}</pre>`;
-                document.body.classList.add('json-mode');
-            } else if (params.format === 'text') {
-                document.body.innerHTML = `<pre>${schpiel}</pre>`;
-                document.body.classList.add('json-mode');
-            } else {
-                // Normal HTML display
-                document.getElementById('schpielOutput').textContent = schpiel;
-                document.getElementById('outputSection').classList.remove('hidden');
-                document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-        
-        function clearForm() {
-            document.getElementById('clientName').value = '';
-            document.getElementById('contactName').value = '';
-            document.getElementById('industry').value = '';
-            document.getElementById('referralSource').value = '';
-            document.getElementById('socialPlatforms').value = '';
-            document.getElementById('strengths').value = '';
-            document.getElementById('improvements').value = '';
-            document.getElementById('additionalNotes').value = '';
-            document.getElementById('outputSection').classList.add('hidden');
-        }
-        
-        function copyToClipboard() {
-            const schpielText = document.getElementById('schpielOutput').textContent;
-            navigator.clipboard.writeText(schpielText).then(function() {
-                const status = document.querySelector('.status');
-                status.textContent = '✅ Copied to clipboard!';
-                setTimeout(() => {
-                    status.textContent = '✨ AI-Generated Schpiel Ready!';
-                }, 2000);
-            }, function(err) {
-                alert('Could not copy text: ', err);
-            });
-        }
-        
-        function exportAsJSON() {
-            if (!window.currentSchpiel) {
-                alert('Please generate a schpiel first');
-                return;
-            }
-            
-            const dataStr = JSON.stringify(window.currentSchpiel, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `schpiel_${window.currentSchpiel.clientName.replace(/\s+/g, '_')}_${Date.now()}.json`;
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-        }
-        
-        // Initialize on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            showClientShowcase();
-            
-            // Handle POST/GET data
-            const params = handlePostData();
-            
-            // Auto-generate if requested
-            if (params.auto === 'true' && document.getElementById('clientName').value) {
-                generateSchpiel();
-            }
-            
-            // CORS headers for API access (note: this needs server-side implementation)
-            if (params.cors) {
-                document.querySelector('.api-status').textContent = 'API Mode';
-            }
-        });
-        
-        // Listen for postMessage (for iframe integration)
-        window.addEventListener('message', function(event) {
-            // Security: Check origin if needed
-            // if (event.origin !== 'https://trusted-domain.com') return;
-            
-            if (event.data.action === 'generate') {
-                // Fill form with data
-                if (event.data.client) document.getElementById('clientName').value = event.data.client;
-                if (event.data.contact) document.getElementById('contactName').value = event.data.contact;
-                if (event.data.industry) document.getElementById('industry').value = event.data.industry;
-                // ... other fields
-                
-                // Generate schpiel
-                generateSchpiel();
-                
-                // Send response back
-                event.source.postMessage({
-                    action: 'response',
-                    data: window.currentSchpiel
-                }, event.origin);
-            }
-        });
-    </script>
+    <p>Loading...</p>
 </body>
 </html>
