@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Optimism - AI-Powered Schpiel Generator</title>
+    <title>Online Optimism - AI-Powered Schpiel Generator API</title>
     <style>
         * {
             margin: 0;
@@ -16,6 +16,11 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+        }
+        
+        body.json-mode {
+            background: white;
+            padding: 10px;
         }
         
         .container {
@@ -74,6 +79,18 @@
             margin-top: 10px;
             font-size: 0.9em;
             backdrop-filter: blur(10px);
+        }
+        
+        .api-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 2;
         }
         
         .content {
@@ -292,14 +309,51 @@
             text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+        
+        .json-output {
+            font-family: monospace;
+            white-space: pre-wrap;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        
+        .api-docs {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .api-docs h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .api-docs code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        
+        .api-example {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="mainContainer">
         <div class="header">
+            <div class="api-status">API Ready</div>
             <h1>AI-Powered Schpiel Generator</h1>
             <p>Online Optimism - Pre-Discovery Call Assistant</p>
-            <div class="ai-badge">✨ Powered by AI for Unique Scripts</div>
+            <div class="ai-badge">✨ Webhook & API Enabled</div>
         </div>
         
         <div class="content">
@@ -397,10 +451,41 @@
                 </div>
             </div>
             
-            <div class="api-section">
-                <h3>Zapier Integration</h3>
-                <p>Use URL parameters to pre-fill the form:</p>
-                <div class="api-endpoint" id="apiEndpoint"></div>
+            <div class="api-docs">
+                <h4>📡 API Documentation for Zapier Integration</h4>
+                
+                <h5>Method 1: GET Request (Simple)</h5>
+                <div class="api-example">
+GET /?client=CompanyName&industry=Healthcare&format=json&auto=true
+                </div>
+                
+                <h5>Method 2: POST Request (Recommended for Zapier)</h5>
+                <div class="api-example">
+POST /
+Content-Type: application/x-www-form-urlencoded
+
+client=CompanyName&contact=ContactName&industry=Healthcare&format=json&auto=true
+                </div>
+                
+                <h5>Response Formats:</h5>
+                <ul>
+                    <li><code>format=json</code> - Returns JSON response only</li>
+                    <li><code>format=html</code> - Returns full HTML page (default)</li>
+                    <li><code>format=text</code> - Returns plain text schpiel only</li>
+                    <li><code>auto=true</code> - Auto-generates on load</li>
+                </ul>
+                
+                <h5>Zapier Webhook Configuration:</h5>
+                <div class="api-example">
+Action: Webhooks by Zapier - POST
+URL: https://your-domain.com/
+Payload Type: form
+Data:
+  client|{{1__company_name}}
+  industry|{{1__industry}}
+  format|json
+  auto|true
+                </div>
             </div>
         </div>
     </div>
@@ -520,6 +605,65 @@
             ]
         };
         
+        // Function to get URL parameters
+        function getUrlParams() {
+            const params = {};
+            const searchParams = new URLSearchParams(window.location.search);
+            
+            // Check for POST data if available
+            if (window.location.hash) {
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                for (let [key, value] of hashParams) {
+                    params[key] = decodeURIComponent(value);
+                }
+            }
+            
+            // Get URL parameters
+            for (let [key, value] of searchParams) {
+                params[key] = decodeURIComponent(value);
+            }
+            
+            return params;
+        }
+        
+        // Function to handle form data from POST request
+        function handlePostData() {
+            // This would normally require server-side processing
+            // For client-side only, we'll use URL parameters
+            const params = getUrlParams();
+            
+            if (params.client) document.getElementById('clientName').value = params.client;
+            if (params.contact) document.getElementById('contactName').value = params.contact;
+            if (params.industry) document.getElementById('industry').value = params.industry;
+            if (params.referral) document.getElementById('referralSource').value = params.referral;
+            if (params.social) document.getElementById('socialPlatforms').value = params.social;
+            if (params.strengths) document.getElementById('strengths').value = params.strengths;
+            if (params.improvements) document.getElementById('improvements').value = params.improvements;
+            if (params.notes) document.getElementById('additionalNotes').value = params.notes;
+            if (params.tone) {
+                document.querySelectorAll('.tone-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                    if (opt.dataset.tone === params.tone) {
+                        opt.classList.add('selected');
+                    }
+                });
+            }
+            
+            return params;
+        }
+        
+        // Helper function to get random element from array
+        function getRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+        
+        // Helper function to get random clients from category
+        function getRandomClients(category, count = 2) {
+            const clients = clientData[category] || [];
+            const shuffled = [...clients].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+        
         // Show sample clients on load
         function showClientShowcase() {
             const showcase = document.getElementById('clientShowcase');
@@ -540,49 +684,6 @@
                 this.classList.add('selected');
             });
         });
-        
-        // Helper function to get random element from array
-        function getRandom(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
-        }
-        
-        // Helper function to get random clients from category
-        function getRandomClients(category, count = 2) {
-            const clients = clientData[category] || [];
-            const shuffled = [...clients].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, count);
-        }
-        
-        // Check for URL parameters on load
-        window.addEventListener('DOMContentLoaded', function() {
-            showClientShowcase();
-            
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            // Pre-fill form with URL parameters
-            if(urlParams.get('client')) document.getElementById('clientName').value = urlParams.get('client');
-            if(urlParams.get('contact')) document.getElementById('contactName').value = urlParams.get('contact');
-            if(urlParams.get('industry')) document.getElementById('industry').value = urlParams.get('industry');
-            if(urlParams.get('referral')) document.getElementById('referralSource').value = urlParams.get('referral');
-            if(urlParams.get('social')) document.getElementById('socialPlatforms').value = urlParams.get('social');
-            if(urlParams.get('strengths')) document.getElementById('strengths').value = urlParams.get('strengths');
-            if(urlParams.get('improvements')) document.getElementById('improvements').value = urlParams.get('improvements');
-            if(urlParams.get('notes')) document.getElementById('additionalNotes').value = urlParams.get('notes');
-            
-            // Auto-generate if triggered from Zapier
-            if(urlParams.get('auto') === 'true' && document.getElementById('clientName').value) {
-                generateSchpiel();
-            }
-            
-            // Update API endpoint example
-            updateAPIEndpoint();
-        });
-        
-        function updateAPIEndpoint() {
-            const baseURL = window.location.origin + window.location.pathname;
-            const exampleURL = `${baseURL}?client=CompanyName&contact=ContactName&industry=Healthcare&auto=true`;
-            document.getElementById('apiEndpoint').textContent = exampleURL;
-        }
         
         function generateSchpiel() {
             const clientName = document.getElementById('clientName').value;
@@ -692,12 +793,9 @@
             const closing = getRandom(aiVariations.closingQuestion);
             schpiel += closing.replace(/{client}/g, clientName);
             
-            // Display the output
-            document.getElementById('schpielOutput').textContent = schpiel;
-            document.getElementById('outputSection').classList.remove('hidden');
-            
             // Store for export
             window.currentSchpiel = {
+                success: true,
                 clientName: clientName,
                 contactName: contactName,
                 industry: industry,
@@ -707,13 +805,27 @@
                 improvements: improvements,
                 additionalNotes: additionalNotes,
                 tone: tone,
-                generatedSchpiel: schpiel,
+                schpielText: schpiel,
+                schpielFormatted: schpiel,
                 generatedAt: new Date().toISOString(),
-                aiGenerated: true
+                aiGenerated: true,
+                version: "2.0"
             };
             
-            // Scroll to output
-            document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+            // Check if we should return JSON, text, or HTML
+            const params = getUrlParams();
+            if (params.format === 'json') {
+                document.body.innerHTML = `<pre class="json-output">${JSON.stringify(window.currentSchpiel, null, 2)}</pre>`;
+                document.body.classList.add('json-mode');
+            } else if (params.format === 'text') {
+                document.body.innerHTML = `<pre>${schpiel}</pre>`;
+                document.body.classList.add('json-mode');
+            } else {
+                // Normal HTML display
+                document.getElementById('schpielOutput').textContent = schpiel;
+                document.getElementById('outputSection').classList.remove('hidden');
+                document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+            }
         }
         
         function clearForm() {
@@ -757,6 +869,47 @@
             linkElement.setAttribute('download', exportFileDefaultName);
             linkElement.click();
         }
+        
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            showClientShowcase();
+            
+            // Handle POST/GET data
+            const params = handlePostData();
+            
+            // Auto-generate if requested
+            if (params.auto === 'true' && document.getElementById('clientName').value) {
+                generateSchpiel();
+            }
+            
+            // CORS headers for API access (note: this needs server-side implementation)
+            if (params.cors) {
+                document.querySelector('.api-status').textContent = 'API Mode';
+            }
+        });
+        
+        // Listen for postMessage (for iframe integration)
+        window.addEventListener('message', function(event) {
+            // Security: Check origin if needed
+            // if (event.origin !== 'https://trusted-domain.com') return;
+            
+            if (event.data.action === 'generate') {
+                // Fill form with data
+                if (event.data.client) document.getElementById('clientName').value = event.data.client;
+                if (event.data.contact) document.getElementById('contactName').value = event.data.contact;
+                if (event.data.industry) document.getElementById('industry').value = event.data.industry;
+                // ... other fields
+                
+                // Generate schpiel
+                generateSchpiel();
+                
+                // Send response back
+                event.source.postMessage({
+                    action: 'response',
+                    data: window.currentSchpiel
+                }, event.origin);
+            }
+        });
     </script>
 </body>
 </html>
